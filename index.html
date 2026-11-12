@@ -554,7 +554,10 @@ body:not(.bar-on) .chat{bottom:calc(16px + env(safe-area-inset-bottom))}
   if(ST){try{if(Object.keys(s).length)sessionStorage.setItem(K,JSON.stringify(s));else s=JSON.parse(sessionStorage.getItem(K)||'{}')}catch(e){}}
   window.CC_SRC=s;
   window.ccTrack=function(name,data){try{if(window.umami)umami.track(name,Object.assign({},data||{},{src:(s.utm_source||'direct')+'/'+(s.utm_medium||'-'),camp:s.utm_campaign||''}))}catch(e){}};
-  window.ccPayUrl=function(u){if(!u)return u;try{var x=new URL(u);Object.keys(s).forEach(function(k){x.searchParams.set(k,s[k])});return x.toString()}catch(e){return u}};
+  /* 12.11 lang1211: к ссылке Polar — reference_id=ru-site|en-site (Polar кладёт его в метаданные checkout → воркер выбирает язык письма
+     и архивов, запасной путь к metadata.lang ссылки). UTM как были. */
+  window.ccPayUrl=function(u){if(!u)return u;try{var x=new URL(u);Object.keys(s).forEach(function(k){x.searchParams.set(k,s[k])});
+    if(/(^|\.)polar\.sh$/.test(x.hostname)&&!x.searchParams.get('reference_id'))x.searchParams.set('reference_id',ST?'ru-site':'en-site');return x.toString()}catch(e){return u}};
   document.addEventListener('click',function(e){
     var t=e.target.closest&&e.target.closest('[data-buy],.tile,.reg,.tabs button,[data-track]');if(!t)return;
     if(t.dataset.buy)ccTrack('buy-click',{plan:t.dataset.buy,cur:window.ccCur||''});
